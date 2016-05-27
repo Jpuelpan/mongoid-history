@@ -24,7 +24,7 @@ module Mongoid
       end
 
       def modifier=(instance)
-        self.modifier_id = instance.id
+        self.modifier_id = instance.try(:id)
       end
 
       def modifier

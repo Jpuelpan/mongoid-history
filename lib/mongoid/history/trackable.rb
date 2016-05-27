@@ -32,9 +32,12 @@ module Mongoid
 
           field options[:version_field].to_sym, type: Integer
 
-          belongs_to_modifier_options = { class_name: Mongoid::History.modifier_class_name }
-          belongs_to_modifier_options[:inverse_of] = options[:modifier_field_inverse_of] if options.key?(:modifier_field_inverse_of)
-          belongs_to options[:modifier_field].to_sym, belongs_to_modifier_options
+          # belongs_to_modifier_options = { class_name: Mongoid::History.modifier_class_name }
+          # belongs_to_modifier_options[:inverse_of] = options[:modifier_field_inverse_of] if options.key?(:modifier_field_inverse_of)
+          # belongs_to options[:modifier_field].to_sym, belongs_to_modifier_options
+
+          field :modifier_id, type: Integer
+
 
           include MyInstanceMethods
           extend SingletonMethods
@@ -71,6 +74,13 @@ module Mongoid
       end
 
       module MyInstanceMethods
+        def modifier=(instance)
+          self.modifier_id = modifier.try(:id)
+        end
+
+        def modifier
+        end
+
         def history_tracks
           @history_tracks ||= Mongoid::History.tracker_class.where(
             scope: related_scope,
@@ -230,12 +240,18 @@ module Mongoid
         end
 
         def history_tracker_attributes(action)
+          Rails.logger.info("\n")
+          Rails.logger.info(modifier_id.inspect)
+          Rails.logger.info(modifier.inspect)
+          Rails.logger.info("\n")
           return @history_tracker_attributes if @history_tracker_attributes
 
           @history_tracker_attributes = {
             association_chain: traverse_association_chain,
             scope: related_scope,
-            modifier: send(history_trackable_options[:modifier_field])
+            # modifier: send(history_trackable_options[:modifier_field])
+            modifier: modifier,
+            modifier_id: modifier_id
           }
 
           original, modified = transform_changes(modified_attributes_for_action(action))
