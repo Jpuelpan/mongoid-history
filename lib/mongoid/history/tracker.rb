@@ -14,12 +14,21 @@ module Mongoid
         field :version,                 type: Integer
         field :action,                  type: String
         field :scope,                   type: String
-        belongs_to :modifier, class_name: Mongoid::History.modifier_class_name
+        # belongs_to :modifier, class_name: Mongoid::History.modifier_class_name
+        field :modifier_id,                type: Integer
 
         index(scope: 1)
         index(association_chain: 1)
 
         Mongoid::History.tracker_class_name = name.tableize.singularize.to_sym
+      end
+
+      def modifier=(instance)
+        self.modifier_id = instance.id
+      end
+
+      def modifier
+        self.modifier_id
       end
 
       def undo!(modifier = nil)
