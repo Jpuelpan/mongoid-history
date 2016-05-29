@@ -240,10 +240,6 @@ module Mongoid
         end
 
         def history_tracker_attributes(action)
-          Rails.logger.info("\n")
-          Rails.logger.info(modifier_id.inspect)
-          Rails.logger.info(modifier.inspect)
-          Rails.logger.info("\n")
           return @history_tracker_attributes if @history_tracker_attributes
 
           @history_tracker_attributes = {
